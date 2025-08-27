@@ -38,6 +38,31 @@ Includes a built-in network testing tool to recommend SRT parameters and a media
 
 -----
 
+## Quick Start: Automated Installation & Testing
+
+For a fast and easy setup, especially on a new system, you can use the provided automated script.
+
+### Automated Installation
+
+A `setup.sh` script is included to automate the entire installation process on a fresh Debian-based (like Ubuntu 24.04) or RHEL-based system. It will install all dependencies, configure the environment, and set up the systemd service.
+
+To run it, clone the repository and execute the script with sudo privileges:
+```bash
+# Clone the repository first if you haven't already
+# git clone https://github.com/your-repo/mcr-srt-streamer.git
+# cd mcr-srt-streamer
+
+sudo bash setup.sh
+```
+
+### Testing Guide
+
+After installation, refer to the comprehensive testing guide to verify all functionality, including the SDI input and output features. This guide explains the hardware and software prerequisites and provides step-by-step instructions.
+
+**[Read the TESTING_GUIDE.md](./TESTING_GUIDE.md)**
+
+-----
+
 ## Features
 
 ### Streaming
