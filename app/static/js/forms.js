@@ -6,21 +6,30 @@
  * @param {string} fileGroupId - The ID of the file input group.
  * @param {string} multicastGroupId - The ID of the multicast input group.
  */
-function initializeFormInputToggle(selectId, fileGroupId, multicastGroupId) {
+function initializeFormInputToggle(selectId, fileGroupId, multicastGroupId, sdiGroupId) {
   const inputTypeSelect = $(selectId);
   const fileGroup = $(fileGroupId);
   const multicastGroup = $(multicastGroupId);
+  const sdiGroup = $(sdiGroupId);
 
   function toggleFields() {
     const selectedType = inputTypeSelect.val();
     // Hide all conditional groups first
     fileGroup.addClass("hidden-input");
     multicastGroup.addClass("hidden-input");
+    if (sdiGroup) {
+      sdiGroup.addClass("hidden-input");
+    }
+
     // Show the relevant group
     if (selectedType === "file") {
       fileGroup.removeClass("hidden-input");
     } else if (selectedType === "multicast") {
       multicastGroup.removeClass("hidden-input");
+    } else if (selectedType === "sdi") {
+      if (sdiGroup) {
+        sdiGroup.removeClass("hidden-input");
+      }
     }
   }
   inputTypeSelect.on("change", toggleFields);

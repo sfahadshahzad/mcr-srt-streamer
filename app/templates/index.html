@@ -40,6 +40,8 @@
                     <a href="{{ url_for("caller_page") }}" class="btn btn-warning ms-2"><i class="fas fa-phone-alt"></i> Start Caller</a>
                     <a href="{{ url_for("smpte.smpte_config_page") }}"
                        class="btn btn-info ms-2"><i class="fas fa-project-diagram"></i> SMPTE 2022-7 Pair</a>
+                    <a href="{{ url_for("sdi_bp.sdi_out_page") }}"
+                       class="btn btn-primary ms-2"><i class="fas fa-tv"></i> SDI Output</a>
                 </div>
             </div>
             {# Flash Messages & Errors #}
@@ -91,6 +93,10 @@
                                         <option value="file"
                                                 {% if form.input_type.data == 'file' %}selected{% endif %}>
                                             File
+                                        </option>
+                                        <option value="sdi"
+                                                {% if form.input_type.data == 'sdi' %}selected{% endif %}>
+                                            SDI Input
                                         </option>
                                         <option value="colorbar_720p50"
                                                 {% if form.input_type.data == 'colorbar_720p50' %}selected{% endif %}>
@@ -145,6 +151,29 @@
                                         {% if form.multicast_interface.errors %}
                                             <div class="invalid-feedback d-block">
                                                 {% for error in form.multicast_interface.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {# SDI Input #}
+                                <div class="mb-3 hidden-input" id="sdi-input-group-listener">
+                                    <div class="mb-3">
+                                        {{ form.sdi_device_id.label(class="form-label") }}
+                                        {{ form.sdi_device_id(class="form-select" + (' is-invalid' if form.sdi_device_id.errors else ''), id="sdi_device_id_listener") }}
+                                        <div class="form-text">Select the SDI hardware input device.</div>
+                                        {% if form.sdi_device_id.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.sdi_device_id.errors %}{{ error }}{% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mb-3">
+                                        {{ form.sdi_video_mode.label(class="form-label") }}
+                                        {{ form.sdi_video_mode(class="form-select" + (' is-invalid' if form.sdi_video_mode.errors else ''), id="sdi_video_mode_listener") }}
+                                        <div class="form-text">Select the video format for the SDI input.</div>
+                                        {% if form.sdi_video_mode.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in form.sdi_video_mode.errors %}{{ error }}{% endfor %}
                                             </div>
                                         {% endif %}
                                     </div>

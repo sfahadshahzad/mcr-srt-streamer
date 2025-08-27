@@ -10,6 +10,8 @@ from app.stream_manager import StreamManager
 from flask_wtf.csrf import CSRFProtect
 
 # Import SMPTE2022-7 components and other blueprints
+from app.sdi_routes import sdi_bp
+from app.sdi_manager import SDIManager
 from app.smpte_routes import smpte_bp
 from app.smpte_manager import SMPTEManager
 from app.routes import register_routes
@@ -125,6 +127,13 @@ else:
         "Could not initialize SMPTEManager due to missing dependencies (app or stream_manager)."
     )
     raise RuntimeError("Could not initialize SMPTEManager.")
+
+if "SDIManager" in globals():
+    app.sdi_manager = SDIManager()
+    logger.info("Initialized SDIManager.")
+else:
+    logger.error("SDIManager class not imported correctly.")
+    raise ImportError("SDIManager could not be initialized.")
 # ------------------------------------------------------
 
 
@@ -149,6 +158,12 @@ if "smpte_bp" in globals():
 else:
     logger.error("smpte_bp blueprint not imported correctly.")
 
+if "sdi_bp" in globals():
+    app.register_blueprint(sdi_bp) # Register the SDI blueprint (prefix is /sdi)
+    logger.info("Registered SDI blueprint.")
+else:
+    logger.error("sdi_bp blueprint not imported correctly.")
+
 
 # --- Initialize CSRF Protection AFTER blueprints are registered ---
 csrf = CSRFProtect()
@@ -162,7 +177,9 @@ if "api_bp" in globals():
     csrf.exempt(api_bp)
 if "smpte_bp" in globals():
     csrf.exempt(smpte_bp)  # Exempt SMPTE blueprint as it contains API endpoints
-logger.info("Exempted API and SMPTE blueprints (if registered) from CSRF protection.")
+if "sdi_bp" in globals():
+    csrf.exempt(sdi_bp)
+logger.info("Exempted API, SMPTE, and SDI blueprints (if registered) from CSRF protection.")
 
 
 # --- Application Initialization Complete ---

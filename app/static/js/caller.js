@@ -1,6 +1,28 @@
 // /opt/mcr-srt-streamer/app/static/js/caller.js
 
 $(document).ready(function () {
+  function loadSdiInputDevices() {
+    $.getJSON("/sdi/api/devices", function (data) {
+      const deviceSelect = $("#sdi_device_id_caller");
+      deviceSelect.empty();
+      if (data.inputs && data.inputs.length > 0) {
+        deviceSelect.append(new Option("-- Select SDI Input --", ""));
+        $.each(data.inputs, function(index, device) {
+            deviceSelect.append(new Option(device.name, device.device_id));
+        });
+      } else {
+        deviceSelect.append(new Option("No input devices found", ""));
+        deviceSelect.prop("disabled", true);
+      }
+    }).fail(function() {
+        console.error("Failed to load SDI input devices for caller form.");
+        const deviceSelect = $("#sdi_device_id_caller");
+        deviceSelect.empty();
+        deviceSelect.append(new Option("Error loading devices", ""));
+        deviceSelect.prop("disabled", true);
+    });
+  }
+
   // Initialize tooltips (can also be done globally in app.js)
   // const tooltipTriggerList = [...document.querySelectorAll('[data-bs-toggle="tooltip"]')];
   // tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -20,6 +42,7 @@ $(document).ready(function () {
       "#input_type_caller",
       "#file-input-group-caller",
       "#multicast-input-group-caller",
+      "#sdi-input-group-caller",
     );
   } else {
     console.error(
@@ -48,4 +71,7 @@ $(document).ready(function () {
       "initializeMediaBrowser or formatBytes function not found (forms.js/app.js missing or failed?)",
     );
   }
+
+  // Load SDI devices for the form
+  loadSdiInputDevices();
 }); // End document.ready

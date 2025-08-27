@@ -458,6 +458,28 @@ $(document).ready(function () {
     }
   }
 
+  function loadSdiInputDevices() {
+    $.getJSON("/sdi/api/devices", function (data) {
+      const deviceSelect = $("#sdi_device_id_listener");
+      deviceSelect.empty();
+      if (data.inputs && data.inputs.length > 0) {
+        deviceSelect.append(new Option("-- Select SDI Input --", ""));
+        $.each(data.inputs, function(index, device) {
+            deviceSelect.append(new Option(device.name, device.device_id));
+        });
+      } else {
+        deviceSelect.append(new Option("No input devices found", ""));
+        deviceSelect.prop("disabled", true);
+      }
+    }).fail(function() {
+        console.error("Failed to load SDI input devices for dashboard form.");
+        const deviceSelect = $("#sdi_device_id_listener");
+        deviceSelect.empty();
+        deviceSelect.append(new Option("Error loading devices", ""));
+        deviceSelect.prop("disabled", true);
+    });
+  }
+
   // --- Initializations ---
   // Initialize listener form specific JS
   $("#encryption_listener")
@@ -471,6 +493,7 @@ $(document).ready(function () {
       "#input_type_listener",
       "#file-input-group-listener",
       "#multicast-input-group-listener",
+      "#sdi-input-group-listener",
     );
   } else {
     console.error(
@@ -501,5 +524,7 @@ $(document).ready(function () {
 
   // Apply results if redirected from network test
   applyNetworkTestResults();
+  // Load SDI devices for the form
+  loadSdiInputDevices();
 }); // End document.ready
 

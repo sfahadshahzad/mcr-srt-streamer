@@ -730,6 +730,33 @@ class StreamManager:
                 tsparse_name = f"tsparse_{key}"
                 tsparse_part = f'! tsparse name="{tsparse_name}" set-timestamps=true alignment=7 smoothing-latency={smoothing_us} parse-private-sections=true ! queue'
                 sync = "false"
+            elif input_type == "sdi":
+                if rtp_encapsulation:
+                    raise ValueError("RTP Encapsulation is not supported for SDI inputs.")
+
+                device_id = config.get("sdi_device_id", 0)
+                video_mode = config.get("sdi_video_mode", "1080i50")
+
+                # Check for a suitable audio encoder
+                audio_encoder = ""
+                if self._check_gst_element("fdkaacenc"):
+                    audio_encoder = "fdkaacenc bitrate=192000"
+                elif self._check_gst_element("voaacenc"):
+                    audio_encoder = "voaacenc bitrate=192000"
+                else:
+                    raise RuntimeError("No suitable AAC encoder found (fdkaacenc or voaacenc).")
+
+                video_src = f"decklinkvideosrc device-number={device_id} mode={video_mode} ! videoconvert"
+                audio_src = f"decklinkaudiosrc device-number={device_id} ! audioconvert"
+
+                pipeline_input_str = (
+                    f"mpegtsmux name=mux ! queue "
+                    f"{video_src} ! queue ! x264enc tune=zerolatency speed-preset=ultrafast bitrate=8000 ! queue ! mux. "
+                    f"{audio_src} ! queue ! {audio_encoder} ! queue ! mux."
+                )
+                input_detail_log = f"SDI Input (Device: {device_id}, Mode: {video_mode})"
+                tsparse_part = f'! tsparse name="tsparse_{key}" set-timestamps=true alignment=7 ! queue'
+                sync = "false" # SDI is a live source
             else:
                 raise ValueError(f"Unsupported input_type: {input_type}")
 

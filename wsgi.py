@@ -26,3 +26,6 @@ if __name__ != "__main__":
     if hasattr(app, "smpte_manager") and hasattr(app.smpte_manager, "start_glib_loop"):
         print("Starting SMPTEManager GLib loop...")
         app.smpte_manager.start_glib_loop()
+    if hasattr(app, "sdi_manager") and hasattr(app.sdi_manager, "start_glib_loop"):
+        print("Starting SDIManager GLib loop...")
+        app.sdi_manager.start_glib_loop()

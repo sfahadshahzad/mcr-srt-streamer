@@ -1,0 +1,67 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container-fluid pt-3">
+    <h2 class="pb-2 border-bottom">SDI Output Configuration</h2>
+
+    <!-- SDI Output Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Start New SDI Output</h5>
+        </div>
+        <div class="card-body">
+            <form id="sdi-output-form" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="uri" class="form-label">{{ form.uri.label }}</label>
+                        {{ form.uri(class="form-control") }}
+                        <div class="invalid-feedback" id="uri-error"></div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="device_id" class="form-label">{{ form.device_id.label }}</label>
+                        {{ form.device_id(class="form-select") }}
+                        <div class="invalid-feedback" id="device_id-error"></div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end mb-3">
+                        <button type="submit" class="btn btn-primary w-100">Start Output</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active SDI Outputs Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Active SDI Outputs</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Status</th>
+                            <th>Input URI</th>
+                            <th>Uptime</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sdi-outputs-table-body">
+                        <!-- Rows will be populated by JavaScript -->
+                        <tr>
+                            <td colspan="5" class="text-center">Loading active outputs...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="{{ url_for('static', filename='js/sdi_out.js') }}"></script>
+{% endblock %}

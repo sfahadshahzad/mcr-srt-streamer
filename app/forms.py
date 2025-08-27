@@ -23,6 +23,22 @@ from flask_wtf.file import FileAllowed
 import re
 
 
+class SDIOutputForm(FlaskForm):
+    """
+    Form for configuring and starting an SDI output stream.
+    """
+    uri = StringField(
+        "UDP Input URI",
+        validators=[
+            DataRequired(),
+            Regexp(r"^udp://@?[\w\d\.-]+:\d+$", message="Invalid UDP URI. Format: udp://[address]:[port]"),
+        ],
+        render_kw={"placeholder": "udp://239.1.1.1:5000", "class": "form-control"},
+    )
+    device_id = SelectField("Output Device", validators=[DataRequired()], coerce=int, render_kw={"class": "form-select"})
+    # No submit button here, it will be handled by JavaScript
+
+
 # --- Custom Widget for Percentage Input ---
 class PercentageInput(Input):
     """
@@ -64,6 +80,7 @@ class StreamForm(FlaskForm):
         choices=[
             ("multicast", "Multicast UDP"),
             ("file", "File"),
+            ("sdi", "SDI Input"),
             ("colorbar_720p50", "Colorbars 720p50"),
             ("colorbar_1080i25", "Colorbars 1080i25"),
         ],
@@ -97,6 +114,25 @@ class StreamForm(FlaskForm):
             "aria-describedby": "multicastInterfaceHelp",
         },
         description="Network interface for multicast input ('Auto' = OS default).",
+    )
+    sdi_device_id = SelectField(
+        "SDI Input Device",
+        validators=[Optional()],
+        coerce=int,
+        render_kw={"class": "form-select"},
+    )
+    sdi_video_mode = SelectField(
+        "SDI Video Mode",
+        validators=[Optional()],
+        # Choices common for DeckLink cards. A real app might populate this dynamically.
+        choices=[
+            ("1080i50", "1080i50"),
+            ("1080p25", "1080p25"),
+            ("720p50", "720p50"),
+            ("pal", "PAL (576i50)"),
+        ],
+        default="1080i50",
+        render_kw={"class": "form-select"},
     )
     # --- End Conditional Inputs ---
 
@@ -173,6 +209,13 @@ class StreamForm(FlaskForm):
                     "A multicast channel must be selected."
                 )
                 input_type_valid = False
+        elif input_type_value == "sdi":
+            if self.sdi_device_id.data is None:
+                self.sdi_device_id.errors.append("An SDI input device must be selected.")
+                input_type_valid = False
+            if not self.sdi_video_mode.data:
+                self.sdi_video_mode.errors.append("An SDI video mode must be selected.")
+                input_type_valid = False
         elif input_type_value.startswith("colorbar_"):
             pass  # No specific validation needed for file/multicast fields here
 
@@ -211,6 +254,7 @@ class CallerForm(FlaskForm):
         choices=[
             ("multicast", "Multicast UDP"),
             ("file", "File"),
+            ("sdi", "SDI Input"),
             ("colorbar_720p50", "Colorbars 720p50"),
             ("colorbar_1080i25", "Colorbars 1080i25"),
         ],
@@ -240,6 +284,24 @@ class CallerForm(FlaskForm):
             "aria-describedby": "multicastInterfaceHelpCaller",
         },
         description="Select network interface for receiving multicast. 'Auto' uses OS default.",
+    )
+    sdi_device_id = SelectField(
+        "SDI Input Device",
+        validators=[Optional()],
+        coerce=int,
+        render_kw={"class": "form-select"},
+    )
+    sdi_video_mode = SelectField(
+        "SDI Video Mode",
+        validators=[Optional()],
+        choices=[
+            ("1080i50", "1080i50"),
+            ("1080p25", "1080p25"),
+            ("720p50", "720p50"),
+            ("pal", "PAL (576i50)"),
+        ],
+        default="1080i50",
+        render_kw={"class": "form-select"},
     )
     # --- End Conditional Inputs ---
 
@@ -320,6 +382,13 @@ class CallerForm(FlaskForm):
                 self.multicast_channel.errors.append(
                     "A multicast channel must be selected."
                 )
+                input_type_valid = False
+        elif input_type_value == "sdi":
+            if self.sdi_device_id.data is None:
+                self.sdi_device_id.errors.append("An SDI input device must be selected.")
+                input_type_valid = False
+            if not self.sdi_video_mode.data:
+                self.sdi_video_mode.errors.append("An SDI video mode must be selected.")
                 input_type_valid = False
         elif input_type_value.startswith("colorbar_"):
             pass  # No specific validation needed for file/multicast fields here
